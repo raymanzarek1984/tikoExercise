@@ -1,4 +1,4 @@
-**Tiko application exercise**
+**Tiko job application exercise**
 
 The task consists in creating a Rest API using Django rest framework https://www.django-rest-framework.org/ to create an Event manager app.
 It should allow users to create a personal account, log in, and create, edit, fetch, and register to attend events.
