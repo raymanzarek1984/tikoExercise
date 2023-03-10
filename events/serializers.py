@@ -15,11 +15,6 @@ class EventSerializer(serializers.ModelSerializer):
             'end_date': {'required': True}
         }
 
-    def validate(self, attrs):
-        # if attrs['password'] != attrs['password2']:
-        #     raise serializers.ValidationError({"password": "Password fields didn't match."})
-        return attrs
-
     def create(self, validated_data):
         obj = self.Meta.model.objects.create(
             name=validated_data['name'],
