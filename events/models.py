@@ -51,3 +51,24 @@ class Event(AbstractDateModified, AbstractDateCreated, models.Model):
 
     def __str__(self):
         return self.name
+
+
+class EventAttendee(AbstractDateModified, AbstractDateCreated, models.Model):
+    event = models.ForeignKey(
+        'events.Event',
+        related_name='attendees',
+        on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        'auth.User',
+        related_name='events',
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        ordering = ('event',)
+        verbose_name = 'event attendee'
+        verbose_name_plural = 'event attendees'
+
+    def __str__(self):
+        return f'{self.event}, Attendee {self.user_id}'
