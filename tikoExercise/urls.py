@@ -24,6 +24,7 @@ from django.urls import (
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('authentication/', include('authentication.urls', namespace='authentication')),
+    path('events/', include('events.urls', namespace='events')),
 ]
 
 if settings.DEBUG:
