@@ -26,3 +26,50 @@ Delivery:
 Please use git. You can choose whatever git platform you want (Github, Bitbucket, Gitlab, etc)
 
 Please provide instructions on how to set up the project in a README file.
+
+**Instructions**
+
+Create your own virtualenv, activate it and install the required modules:
+
+```
+pip install -r requirements.txt
+```
+
+Create the DB by running the following commands:
+
+```
+python manage.py migrate
+python manage.py loaddata fixtures.json
+```
+
+In the DB you will find 1 superuser and 2 regular users with the following credentials:
+
+```
+Superuser:
+username: admin
+password: 123456
+```
+
+```
+User Foo Bar:
+username: foobar
+password: 12345678!
+```
+
+```
+User John Doe:
+username: johndoe
+password: 12345678!
+```
+
+Once you have set up the project, you can run it by using the builtin Django development server (by default it runs on 127.0.0.1 and port 8000):
+
+```
+python manage.py runserver
+```
+
+In order to run the tests, launch the following command:
+
+```
+python manage.py test --settings=tikoExercise.settings_test
+```
