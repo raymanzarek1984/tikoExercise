@@ -85,6 +85,9 @@ class EventDeleteView(generics.DestroyAPIView):
 class EventAttendeeRegisterView(generics.CreateAPIView):
     """
     Registers an attendee to an event entry, related to :model:`events.EventAttendee`.
+    Attendees cannot register to past events.
+    Attendees can be registered until capacity is reached.
+    Attendees can only register once.
     """
     queryset = EventAttendee.objects.all()
     permission_classes = (IsAuthenticated,)
@@ -107,6 +110,8 @@ class EventAttendeeRegisterView(generics.CreateAPIView):
 class EventAttendeeUnregisterView(generics.DestroyAPIView):
     """
     Unregisters an attendee from an event entry, related to :model:`events.EventAttendee`.
+    Attendees cannot unregister from past events.
+    Attendees cannot unregister other attendees.
     """
     queryset = EventAttendee.objects.all()
     permission_classes = (IsAuthenticated,)
@@ -117,5 +122,5 @@ class EventAttendeeUnregisterView(generics.DestroyAPIView):
         if obj.event.start_date < timezone.now().date():
             raise exceptions.PermissionDenied({'event': 'It is not allowed to unregister from past events.'})
         if obj.user != self.request.user:
-            raise exceptions.PermissionDenied({'user': 'It is not allowed to unregister other users.'})
+            raise exceptions.PermissionDenied({'user': 'It is not allowed to unregister other attendees.'})
         return obj
