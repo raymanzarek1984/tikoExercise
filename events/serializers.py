@@ -21,7 +21,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        fields = ('name', 'description', 'start_date', 'end_date', 'attendees', 'created_by', 'created_on', 'modified_on')
+        fields = ('name', 'description', 'start_date', 'end_date', 'attendees', 'capacity', 'created_by', 'created_on', 'modified_on')
         extra_kwargs = {
             'name': {'required': True},
             'description': {'required': True},

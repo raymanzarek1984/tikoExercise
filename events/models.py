@@ -44,6 +44,10 @@ class Event(AbstractDateModified, AbstractDateCreated, models.Model):
         on_delete=models.CASCADE,
         verbose_name='created by'
     )
+    capacity = models.PositiveSmallIntegerField(
+        default=0,  # Means unlimited
+        verbose_name='capacity'
+    )
 
     class Meta:
         ordering = ('-start_date',)

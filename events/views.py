@@ -91,8 +91,11 @@ class EventAttendeeRegisterView(generics.CreateAPIView):
     serializer_class = EventAttendeeSerializer
 
     def perform_create(self, serializer):
-        if serializer.validated_data['event'].start_date < timezone.now().date():
-            raise exceptions.PermissionDenied({'event': 'It is not allowed to register or unregister to past events.'})
+        event = serializer.validated_data['event']
+        if event.start_date < timezone.now().date():
+            raise exceptions.PermissionDenied({'event': 'It is not allowed to register to past events.'})
+        if event.capacity and event.attendees.count() >= event.capacity:
+            raise exceptions.PermissionDenied({'event': 'It is not allowed to register to a full event.'})
         # Set the user to request User
         serializer.validated_data['user'] = self.request.user
         super(EventAttendeeRegisterView, self).perform_create(serializer)
@@ -109,7 +112,7 @@ class EventAttendeeUnregisterView(generics.DestroyAPIView):
     def get_object(self):
         obj = super(EventAttendeeUnregisterView, self).get_object()
         if obj.event.start_date < timezone.now().date():
-            raise exceptions.PermissionDenied({'event': 'It is not allowed to register or unregister to past events.'})
+            raise exceptions.PermissionDenied({'event': 'It is not allowed to unregister from past events.'})
         if obj.user != self.request.user:
-            raise exceptions.PermissionDenied({'user': 'It is not allowed to register or unregister other users.'})
+            raise exceptions.PermissionDenied({'user': 'It is not allowed to unregister other users.'})
         return obj

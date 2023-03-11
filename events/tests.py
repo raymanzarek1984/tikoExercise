@@ -216,7 +216,7 @@ class EventAttendeeTests(AuthenticationTestMixin, APITestCase):
         # Test unregister from an Event to which the user Foo Bar was not registered
         response_foobar = self.client.delete(url_unregister, format='json', HTTP_AUTHORIZATION=f"Bearer {self.access_token_foobar}")
         self.assertEqual(response_foobar.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(response_foobar.data['user'], 'It is not allowed to register or unregister other users.')
+        self.assertEqual(response_foobar.data['user'], 'It is not allowed to unregister other users.')
 
         # Test unregister from an Event to which the user John Doe was registered
         response_johndoe = self.client.delete(url_unregister, format='json', HTTP_AUTHORIZATION=f"Bearer {self.access_token_johndoe}")
@@ -229,7 +229,7 @@ class EventAttendeeTests(AuthenticationTestMixin, APITestCase):
         """
         response = self.client.post(self.url_register, self.data_1, format='json', HTTP_AUTHORIZATION=f"Bearer {self.access_token_johndoe}")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(response.data['event'], 'It is not allowed to register or unregister to past events.')
+        self.assertEqual(response.data['event'], 'It is not allowed to register to past events.')
 
     def test_unregister_nok(self):
         """
@@ -241,4 +241,27 @@ class EventAttendeeTests(AuthenticationTestMixin, APITestCase):
 
         response = self.client.delete(url_unregister, format='json', HTTP_AUTHORIZATION=f"Bearer {self.access_token_johndoe}")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(response.data['event'], 'It is not allowed to register or unregister to past events.')
+        self.assertEqual(response.data['event'], 'It is not allowed to unregister from past events.')
+
+    def test_register_capacity(self):
+        """
+        Ensure we can register an EventAttendee object with respect of the capacity.
+        """
+        # Register an attendee on Event 2 with capacity 1
+        obj = EventAttendee.objects.create(event_id=2, user_id=2)
+
+        response_johndoe = self.client.post(self.url_register, self.data_2, format='json', HTTP_AUTHORIZATION=f"Bearer {self.access_token_johndoe}")
+        self.assertEqual(response_johndoe.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response_johndoe.data['event'], 'It is not allowed to register to a full event.')
+
+        response_foobar = self.client.post(self.url_register, self.data_3, format='json', HTTP_AUTHORIZATION=f"Bearer {self.access_token_foobar}")
+        self.assertEqual(response_foobar.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(EventAttendee.objects.count(), 2)
+        self.assertEqual(response_foobar.data['event'], 3)
+        self.assertEqual(response_foobar.data['user'], 2)
+
+        response_johndoe = self.client.post(self.url_register, self.data_3, format='json', HTTP_AUTHORIZATION=f"Bearer {self.access_token_johndoe}")
+        self.assertEqual(response_johndoe.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(EventAttendee.objects.count(), 3)
+        self.assertEqual(response_johndoe.data['event'], 3)
+        self.assertEqual(response_johndoe.data['user'], 3)
