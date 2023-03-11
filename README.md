@@ -84,7 +84,10 @@ Then you need to interact with the login API in order to retrieve an access_toke
 Once authorized, you can interact with the existing APIs, such as:
 ```
 /events/
-/events/attendee/
-/events/attendee/<id>/
-/events/instance/<id>/
+/events/create/
+/events/<id>/
+/events/update/<id>/
+/events/delete/<id>/
+/events/register-attendee/
+/events/unregister-attendee/<id>/
 ```
