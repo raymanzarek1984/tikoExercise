@@ -41,7 +41,8 @@ class Event(AbstractDateModified, AbstractDateCreated, models.Model):
         blank=True,
         null=True,
         related_name='event_creators',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        verbose_name='created by'
     )
 
     class Meta:
@@ -57,12 +58,14 @@ class EventAttendee(AbstractDateModified, AbstractDateCreated, models.Model):
     event = models.ForeignKey(
         'events.Event',
         related_name='attendees',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        verbose_name='event'
     )
     user = models.ForeignKey(
         'auth.User',
         related_name='events',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        verbose_name='user'
     )
 
     class Meta:
