@@ -66,12 +66,12 @@ class EventTests(AuthenticationTestMixin, APITestCase):
         }
         cls.query_mine = {'mine': True}
         cls.url_event_list = reverse('events:list')
+        cls.url_event_create = reverse('events:create')
         cls.url_instance_get_1 = reverse('events:get', args=[1])
         cls.url_instance_update_1 = reverse('events:update', args=[1])
         cls.url_instance_delete_1 = reverse('events:delete', args=[1])
 
     def _create_instance_1(self):
-        # self.client.post(self.url_event_list, self.data_create_instance_1, format='json', HTTP_AUTHORIZATION=f"Bearer {self.access_token_johndoe}")
         Event.objects.create(created_by_id=3, **self.data_create_instance_1)
 
     def test_fetch_list(self):
@@ -90,7 +90,7 @@ class EventTests(AuthenticationTestMixin, APITestCase):
         """
         Ensure we can create an Event object.
         """
-        response = self.client.post(self.url_event_list, self.data_create_instance_1, format='json', HTTP_AUTHORIZATION=f"Bearer {self.access_token_johndoe}")
+        response = self.client.post(self.url_event_create, self.data_create_instance_1, format='json', HTTP_AUTHORIZATION=f"Bearer {self.access_token_johndoe}")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Event.objects.count(), 1)
         self.assertEqual(response.data['name'], 'Test event')
@@ -157,7 +157,7 @@ class EventTests(AuthenticationTestMixin, APITestCase):
 
         response_foobar = self.client.put(self.url_instance_update_1, self.data_update_instance_1, format='json', HTTP_AUTHORIZATION=f"Bearer {self.access_token_foobar}")
         self.assertEqual(response_foobar.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(response_foobar.data['created_by'], 'It is not allowed to edit or delete other users\' events.')
+        self.assertEqual(response_foobar.data['created_by'], 'It is not allowed to edit other users\' events.')
 
     def test_delete_nok(self):
         """
@@ -167,7 +167,7 @@ class EventTests(AuthenticationTestMixin, APITestCase):
 
         response_foobar = self.client.delete(self.url_instance_delete_1, format='json', HTTP_AUTHORIZATION=f"Bearer {self.access_token_foobar}")
         self.assertEqual(response_foobar.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(response_foobar.data['created_by'], 'It is not allowed to edit or delete other users\' events.')
+        self.assertEqual(response_foobar.data['created_by'], 'It is not allowed to delete other users\' events.')
 
 
 class EventAttendeeTests(AuthenticationTestMixin, APITestCase):

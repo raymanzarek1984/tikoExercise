@@ -73,3 +73,18 @@ In order to run the tests, launch the following command:
 ```
 python manage.py test --settings=tikoExercise.settings_test
 ```
+
+In order to browse the API documentation provided by Swagger UI, navigate to:
+
+```
+127.0.0.1:8000/docs/
+```
+
+Then you need to interact with the login API in order to retrieve an access_token to be used later in the Authorization section.
+Once authorized, you can interact with the existing APIs, such as:
+```
+/events/
+/events/attendee/
+/events/attendee/<id>/
+/events/instance/<id>/
+```

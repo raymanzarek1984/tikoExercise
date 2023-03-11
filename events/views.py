@@ -13,18 +13,29 @@ from events.serializers import (
 )
 
 
-class EventListCreateView(generics.CreateAPIView, generics.ListAPIView):
+class EventListView(generics.ListAPIView):
+    """
+    Retrieves a list of event entries, related to :model:`events.Event`.
+    """
     queryset = Event.objects.all()
     permission_classes = (IsAuthenticated,)
     serializer_class = EventSerializer
 
     def get_queryset(self):
-        queryset = super(EventListCreateView, self).get_queryset()
+        queryset = super(EventListView, self).get_queryset()
         # Handle the mine query parameter in order to filter User's own Events only
         mine = self.request.query_params.get('mine')
         if mine is not None:
             queryset = queryset.filter(created_by=self.request.user)
         return queryset
+
+
+class EventCreateView(generics.CreateAPIView):
+    """
+    Creates an event entry, related to :model:`events.Event`.
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = EventSerializer
 
     def perform_create(self, serializer):
         # Set the created by to the request User
@@ -33,24 +44,48 @@ class EventListCreateView(generics.CreateAPIView, generics.ListAPIView):
 
 
 class EventGetView(generics.RetrieveAPIView):
+    """
+    Retrieves an event entry, related to :model:`events.Event`.
+    """
     queryset = Event.objects.all()
     permission_classes = (IsAuthenticated,)
     serializer_class = EventSerializer
 
 
-class EventUpdateDeleteView(generics.DestroyAPIView, generics.UpdateAPIView):
+class EventUpdateView(generics.UpdateAPIView):
+    """
+    Updates an event entry, related to :model:`events.Event`.
+    """
     queryset = Event.objects.all()
     permission_classes = (IsAuthenticated,)
     serializer_class = EventSerializer
 
     def get_object(self):
-        obj = super(EventUpdateDeleteView, self).get_object()
+        obj = super(EventUpdateView, self).get_object()
         if obj.created_by != self.request.user:
-            raise exceptions.PermissionDenied({'created_by': 'It is not allowed to edit or delete other users\' events.'})
+            raise exceptions.PermissionDenied({'created_by': 'It is not allowed to edit other users\' events.'})
+        return obj
+
+
+class EventDeleteView(generics.DestroyAPIView):
+    """
+    Deletes an event entry, related to :model:`events.Event`.
+    """
+    queryset = Event.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = EventSerializer
+
+    def get_object(self):
+        obj = super(EventDeleteView, self).get_object()
+        if obj.created_by != self.request.user:
+            raise exceptions.PermissionDenied({'created_by': 'It is not allowed to delete other users\' events.'})
         return obj
 
 
 class EventAttendeeRegisterView(generics.CreateAPIView):
+    """
+    Registers an attendee to an event entry, related to :model:`events.EventAttendee`.
+    """
     queryset = EventAttendee.objects.all()
     permission_classes = (IsAuthenticated,)
     serializer_class = EventAttendeeSerializer
@@ -64,6 +99,9 @@ class EventAttendeeRegisterView(generics.CreateAPIView):
 
 
 class EventAttendeeUnregisterView(generics.DestroyAPIView):
+    """
+    Unregisters an attendee from an event entry, related to :model:`events.EventAttendee`.
+    """
     queryset = EventAttendee.objects.all()
     permission_classes = (IsAuthenticated,)
     serializer_class = EventAttendeeSerializer
