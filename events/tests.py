@@ -216,7 +216,7 @@ class EventAttendeeTests(AuthenticationTestMixin, APITestCase):
         # Test unregister from an Event to which the user Foo Bar was not registered
         response_foobar = self.client.delete(url_unregister, format='json', HTTP_AUTHORIZATION=f"Bearer {self.access_token_foobar}")
         self.assertEqual(response_foobar.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(response_foobar.data['user'], 'It is not allowed to unregister other users.')
+        self.assertEqual(response_foobar.data['user'], 'It is not allowed to unregister other attendees.')
 
         # Test unregister from an Event to which the user John Doe was registered
         response_johndoe = self.client.delete(url_unregister, format='json', HTTP_AUTHORIZATION=f"Bearer {self.access_token_johndoe}")
