@@ -265,3 +265,15 @@ class EventAttendeeTests(AuthenticationTestMixin, APITestCase):
         self.assertEqual(EventAttendee.objects.count(), 3)
         self.assertEqual(response_johndoe.data['event'], 3)
         self.assertEqual(response_johndoe.data['user'], 3)
+
+    def test_register_duplicated(self):
+        """
+        Ensure we cannot register more than once to an EventAttendee object.
+        """
+        # Register an attendee on Event 2 with capacity 1
+        obj = EventAttendee.objects.create(event_id=3, user_id=3)
+
+        response_johndoe = self.client.post(self.url_register, self.data_3, format='json', HTTP_AUTHORIZATION=f"Bearer {self.access_token_johndoe}")
+        self.assertEqual(response_johndoe.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response_johndoe.data['event'], 'It is not allowed to register more than once to an event.')
+

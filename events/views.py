@@ -96,6 +96,9 @@ class EventAttendeeRegisterView(generics.CreateAPIView):
             raise exceptions.PermissionDenied({'event': 'It is not allowed to register to past events.'})
         if event.capacity and event.attendees.count() >= event.capacity:
             raise exceptions.PermissionDenied({'event': 'It is not allowed to register to a full event.'})
+        # Check for unique attendees
+        if self.request.user.id in event.attendees.select_related('event', 'user').values_list('user_id', flat=True):
+            raise exceptions.PermissionDenied({'event': 'It is not allowed to register more than once to an event.'})
         # Set the user to request User
         serializer.validated_data['user'] = self.request.user
         super(EventAttendeeRegisterView, self).perform_create(serializer)
